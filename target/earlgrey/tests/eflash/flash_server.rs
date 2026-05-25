@@ -38,7 +38,7 @@ fn flash_server() -> Result<(), ErrorCode> {
     let mut driver = EmbeddedFlash::new_with_interrupts(
         unsafe { flash_ctrl_core::FlashCtrl::new() });
     driver.set_default_permission(Permission::FULL_ACCESS);
-    for i in 5..9 {
+    for i in 5..10 {
         driver.set_info_permission(FlashAddress::info(0, i, 0), Permission::FULL_ACCESS)?;
         driver.set_info_permission(FlashAddress::info(1, i, 0), Permission::FULL_ACCESS)?;
     }
