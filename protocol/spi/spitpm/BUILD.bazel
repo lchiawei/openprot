@@ -1,0 +1,23 @@
+# Licensed under the Apache-2.0 license
+# SPDX-License-Identifier: Apache-2.0
+
+load("@pigweed//pw_kernel/tooling:rust_app.bzl", "rust_app")
+
+rust_app(
+    name = "spi_tpm_bridge",
+    srcs = [
+        "src/main.rs",
+    ],
+    codegen_crate_name = "spi_tpm_bridge_codegen",
+    edition = "2024",
+    system_config = "@pigweed//pw_kernel/target:system_config_file",
+    tags = ["kernel"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//target/earlgrey/registers",
+        "@pigweed//pw_kernel/userspace",
+        "@pigweed//pw_log/rust:pw_log",
+        "@pigweed//pw_status/rust:pw_status",
+        "@ureg",
+    ],
+)

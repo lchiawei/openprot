@@ -1,0 +1,97 @@
+// Licensed under the Apache-2.0 license
+// SPDX-License-Identifier: Apache-2.0
+{
+  arch: {
+    type: "riscv",
+  },
+  kernel: {
+    flash_start_address: 0xA0010000,
+    flash_size_bytes: 65536,
+    ram_start_address: 0x10000000,
+    ram_size_bytes: 32768,
+    interrupt_table: {
+      table: {}
+    },
+  },
+  apps: [
+    {
+      name: "mock_tpm_service",
+      flash_size_bytes: 32768,
+      processes: [
+        {
+          name: "mock_tpm_service",
+          ram_size_bytes: 16384,
+          objects: [
+            {
+              name: "ipc",
+              type: "channel_handler",
+            }
+          ],
+          threads: [
+            {
+              name: "tpm_thread",
+              kernel_stack_size_bytes: 2048,
+            }
+          ],
+        }
+      ],
+    },
+    {
+      name: "spi_tpm_bridge",
+      flash_size_bytes: 32768,
+      processes: [
+        {
+          name: "spi_tpm_bridge",
+          ram_size_bytes: 16384,
+          objects: [
+            {
+              name: "ipc",
+              type: "channel_initiator",
+              handler_process: "mock_tpm_service",
+              handler_object_name: "ipc",
+            }
+          ],
+          memory_mappings: [
+            {
+              name: "spi_device",
+              type: "device",
+              start_address: 0x40050000,
+              size_bytes: 0x1000,
+            }
+          ],
+          threads: [
+            {
+              name: "spi_thread",
+              kernel_stack_size_bytes: 2048,
+            }
+          ],
+        }
+      ],
+    },
+    {
+      name: "spi_test_driver",
+      flash_size_bytes: 32768,
+      processes: [
+        {
+          name: "spi_test_driver",
+          ram_size_bytes: 16384,
+          objects: [],
+          memory_mappings: [
+            {
+              name: "spi_host0",
+              type: "device",
+              start_address: 0x40300000, // 👈 物理 SPI Host0 基底地址！
+              size_bytes: 0x40,
+            }
+          ],
+          threads: [
+            {
+              name: "driver_thread",
+              kernel_stack_size_bytes: 2048,
+            }
+          ],
+        }
+      ],
+    }
+  ]
+}
