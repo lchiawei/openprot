@@ -74,6 +74,21 @@ rust_test(
 )
 
 rust_library(
+    name = "spi_host",
+    srcs = ["spi_host.rs"],
+    crate_name = "earlgrey_spi_host",
+    edition = "2024",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//target/earlgrey/registers:spi_host",
+        "//util/regcpy",
+        "@pigweed//pw_log/rust:pw_log",
+        "@rust_crates//:embedded-hal",
+        "@ureg",
+    ],
+)
+
+rust_library(
     name = "uart_driver",
     srcs = ["uart_driver.rs"],
     crate_name = "earlgrey_uart_driver",
