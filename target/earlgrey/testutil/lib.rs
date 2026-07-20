@@ -1,13 +1,15 @@
 // Licensed under the Apache-2.0 license
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::{anyhow, bail, Result};
+use anyhow::{anyhow, bail, Context, Result};
+use std::io::Cursor;
 use std::time::Duration;
 use zerocopy::FromBytes;
 
 use opentitanlib::io::console::ConsoleExt;
 use opentitanlib::io::uart::Uart;
 use opentitanlib::io::usb::UsbDevice;
+use opentitanlib::ownership::{OwnerBlock, TlvHeader};
 use opentitanlib::rescue::dfu::{DfuRequest, DfuRequestType, DfuState, DfuStatus};
 
 const DFU_TIMEOUT: Duration = Duration::from_secs(10);
@@ -204,4 +206,12 @@ pub fn sequence_dfu_upload(
     }
 
     Ok(uploaded_data)
+}
+
+/// Parses a binary Owner Block payload (including the `TlvHeader`) from a byte slice.
+pub fn parse_owner_block(data: &[u8]) -> Result<OwnerBlock> {
+    let mut cursor = Cursor::new(data);
+    let header =
+        TlvHeader::read(&mut cursor).context("Failed to parse TlvHeader from Owner Block")?;
+    OwnerBlock::read(&mut cursor, header).context("Failed to parse OwnerBlock payload")
 }

@@ -113,7 +113,7 @@ pub const DFU_ALT_FIRMWARE: u8 = 0;
 pub const DFU_ALT_UDS_CERT: u8 = 1;
 pub const DFU_ALT_CDI0_CERT: u8 = 2;
 pub const DFU_ALT_CDI1_CERT: u8 = 3;
-pub const DFU_ALT_RESERVED: u8 = 4; // Access to OWNER_PAGE_1
+pub const DFU_ALT_OWNER_BLOCK: u8 = 4;
 pub const DFU_ALT_SPI_EEPROM0: u8 = 5;
 
 /// Retrieves a certificate from the info partition in flash.
@@ -463,6 +463,13 @@ impl<IPC: IpcChannel> DfuHandler for EarlgreyDfuHandler<IPC> {
                     .read(FlashAddress::new(address), data)
                     .map_err(|_| DfuStatus::ErrUnknown)?;
                 Ok(data.len())
+            }
+            DFU_ALT_OWNER_BLOCK => {
+                let read_len = core::cmp::min(2048, data.len());
+                self.flash
+                    .read(FlashAddress::info(1, 3, 0), &mut data[..read_len])
+                    .map_err(|_| DfuStatus::ErrUnknown)?;
+                Ok(read_len)
             }
             _ => Err(DfuStatus::ErrFile),
         }

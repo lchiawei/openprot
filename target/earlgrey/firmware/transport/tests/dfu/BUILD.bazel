@@ -157,3 +157,74 @@ opentitan_test(
     test_cmd = "--logging=info --firmware=target/earlgrey/firmware/transport/tests/dfu/bootinfo_simple.app_prod_0.signed.bin",
     test_harness = ":host_usb_dfu_spi_flash",
 )
+
+opentitan_rust_binary(
+    name = "host_usb_dfu_owner_block",
+    srcs = ["host_usb_dfu_owner_block.rs"],
+    data = [
+        "//target/earlgrey/signing/keys/dummy:dummy_owner_bin",
+    ],
+    edition = "2024",
+    rustc_flags = [
+        "-C",
+        "link-arg=-Wl,--allow-shlib-undefined",
+    ],
+    deps = [
+        "//target/earlgrey/testutil",
+        "//third_party/lowrisc_opentitan:opentitanlib",
+        "//third_party/lowrisc_opentitan:usb_test_helper",
+        "@ot_crate_index//:anyhow",
+        "@ot_crate_index//:clap",
+        "@ot_crate_index//:log",
+    ],
+)
+
+sign_bin(
+    name = "transport_signed_transfer",
+    basename = "transport_transfer",
+    bin = "//target/earlgrey/firmware/transport:transport_firmware",
+    ecdsa_key = {
+        "//target/earlgrey/signing/keys/dummy:ecdsa_keyset": "app_prod_0",
+    },
+    manifest = ":owner_transfer_manifest",
+)
+
+opentitan_test(
+    name = "dfu_owner_block_hyper310_test",
+    timeout = "eternal",
+    clear_bitstream = True,
+    ecdsa_key = FPGA_ECDSA_KEY,
+    environment = "//target/earlgrey/env:hyper310",
+    interface = "hyper310",
+    tags = [
+        "hardware",
+        "hyper310",
+    ],
+    target = "//target/earlgrey/firmware/transport:transport_firmware",
+    target_data = [
+        ":transport_signed_transfer",
+        "//target/earlgrey/signing/keys/dummy:dummy_owner_bin",
+    ],
+    test_cmd = "--logging=info --firmware=target/earlgrey/firmware/transport/tests/dfu/transport_transfer.app_prod_0.signed.bin --golden-owner-block=target/earlgrey/signing/keys/dummy/dummy_owner_bin.bin",
+    test_harness = ":host_usb_dfu_owner_block",
+)
+
+opentitan_test(
+    name = "dfu_owner_block_hyper340_test",
+    timeout = "eternal",
+    clear_bitstream = True,
+    ecdsa_key = FPGA_ECDSA_KEY,
+    environment = "//target/earlgrey/env:hyper340",
+    interface = "hyper340",
+    tags = [
+        "hardware",
+        "hyper340",
+    ],
+    target = "//target/earlgrey/firmware/transport:transport_firmware",
+    target_data = [
+        ":transport_signed_transfer",
+        "//target/earlgrey/signing/keys/dummy:dummy_owner_bin",
+    ],
+    test_cmd = "--logging=info --firmware=target/earlgrey/firmware/transport/tests/dfu/transport_transfer.app_prod_0.signed.bin --golden-owner-block=target/earlgrey/signing/keys/dummy/dummy_owner_bin.bin",
+    test_harness = ":host_usb_dfu_owner_block",
+)

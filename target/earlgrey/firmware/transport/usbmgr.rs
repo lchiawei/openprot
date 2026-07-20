@@ -30,9 +30,9 @@ use usb_stack::{DescriptorSource, UsbAction, UsbClass};
 
 mod dfu;
 use dfu::{
-    EarlgreyDfuHandler, DFU_ALT_CDI0_CERT, DFU_ALT_CDI1_CERT, DFU_ALT_FIRMWARE, DFU_ALT_RESERVED,
-    DFU_ALT_SPI_EEPROM0, DFU_ALT_UDS_CERT, DFU_CDI0_CERT, DFU_CDI1_CERT, DFU_FIRMWARE,
-    DFU_UDS_CERT,
+    EarlgreyDfuHandler, DFU_ALT_CDI0_CERT, DFU_ALT_CDI1_CERT, DFU_ALT_FIRMWARE,
+    DFU_ALT_OWNER_BLOCK, DFU_ALT_SPI_EEPROM0, DFU_ALT_UDS_CERT, DFU_CDI0_CERT, DFU_CDI1_CERT,
+    DFU_FIRMWARE, DFU_UDS_CERT,
 };
 use earlgrey_sysmgr_client::SysmgrClient;
 use protocol_usb_cdc_acm::{CdcAcm, CdcAcmBuilder};
@@ -54,7 +54,7 @@ const DFU_FIRMWARE_HANDLE: hal_usb::StringHandle = hal_usb::StringHandle(6);
 const DFU_UDS_CERT_HANDLE: hal_usb::StringHandle = hal_usb::StringHandle(7);
 const DFU_CDI0_CERT_HANDLE: hal_usb::StringHandle = hal_usb::StringHandle(8);
 const DFU_CDI1_CERT_HANDLE: hal_usb::StringHandle = hal_usb::StringHandle(9);
-const DFU_RESERVED_HANDLE: hal_usb::StringHandle = hal_usb::StringHandle(10);
+const DFU_OWNER_BLOCK_HANDLE: hal_usb::StringHandle = hal_usb::StringHandle(10);
 const DFU_SPI_EEPROM_HANDLE: hal_usb::StringHandle = hal_usb::StringHandle(11);
 
 // The serial number size is 2 bytes (USB descriptor header) + 32 bytes of
@@ -104,7 +104,7 @@ const CONFIG_DESC: ConfigDescriptor = ConfigDescriptor {
         DFU_BUILDER.interface(DFU_ALT_UDS_CERT, DFU_UDS_CERT_HANDLE, &[]),
         DFU_BUILDER.interface(DFU_ALT_CDI0_CERT, DFU_CDI0_CERT_HANDLE, &[]),
         DFU_BUILDER.interface(DFU_ALT_CDI1_CERT, DFU_CDI1_CERT_HANDLE, &[]),
-        DFU_BUILDER.interface(DFU_ALT_RESERVED, DFU_RESERVED_HANDLE, &[]),
+        DFU_BUILDER.interface(DFU_ALT_OWNER_BLOCK, DFU_OWNER_BLOCK_HANDLE, &[]),
         DFU_BUILDER.interface(
             DFU_ALT_SPI_EEPROM0,
             DFU_SPI_EEPROM_HANDLE,
@@ -127,7 +127,8 @@ const USB_COMM: hal_usb::StringDescriptorRef =
     hal_usb::string_descriptor!("CDC Comm Interface").as_ref();
 const USB_DATA: hal_usb::StringDescriptorRef =
     hal_usb::string_descriptor!("CDC Data Interface").as_ref();
-const DFU_RESERVED: hal_usb::StringDescriptorRef = hal_usb::string_descriptor!("Reserved").as_ref();
+const DFU_OWNER_BLOCK: hal_usb::StringDescriptorRef =
+    hal_usb::string_descriptor!("Owner Block").as_ref();
 const DFU_SPI_EEPROM: hal_usb::StringDescriptorRef =
     hal_usb::string_descriptor!("SPI EEPROM 0").as_ref();
 
@@ -171,8 +172,8 @@ impl DescriptorSource for MyDescriptors<'_> {
             Some(DFU_CDI0_CERT)
         } else if h == DFU_CDI1_CERT_HANDLE.0 {
             Some(DFU_CDI1_CERT)
-        } else if h == DFU_RESERVED_HANDLE.0 {
-            Some(DFU_RESERVED)
+        } else if h == DFU_OWNER_BLOCK_HANDLE.0 {
+            Some(DFU_OWNER_BLOCK)
         } else if h == DFU_SPI_EEPROM_HANDLE.0 {
             Some(DFU_SPI_EEPROM)
         } else {
