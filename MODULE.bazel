@@ -142,7 +142,7 @@ archive_override(
 bazel_dep(name = "lowrisc_opentitan")
 git_override(
     module_name = "lowrisc_opentitan",
-    commit = "ddf4f864aa10a277bc8b5f6efc515512bc4eff71",
+    commit = "11590984fa",
     remote = "https://github.com/lchiawei/opentitan",
 )
 

@@ -4,11 +4,6 @@
 # Default to C++17 to ensure compatibility.
 common --@pigweed//pw_toolchain/cc:cxx_standard=17
 
-# Enable OpenTitan transport backends by default for host tools and test harnesses
-build --@lowrisc_opentitan//sw/host/opentitanlib:transport_chipwhisperer=true
-build --@lowrisc_opentitan//sw/host/opentitanlib:transport_hyperdebug=true
-build --@lowrisc_opentitan//sw/host/opentitanlib:transport_verilator=true
-
 # Enable Rust formatting support in pigweed presubmits
 common --@pigweed//pw_presubmit/py:enable_rust_formatter=true
 common:cxx20 --//pw_toolchain/cc:cxx_standard=20
