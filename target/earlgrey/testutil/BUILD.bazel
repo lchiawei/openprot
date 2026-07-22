@@ -1,11 +1,11 @@
 # Licensed under the Apache-2.0 license
 # SPDX-License-Identifier: Apache-2.0
 
-load("//third_party/lowrisc_opentitan:defs.bzl", "opentitan_rust_library")
+load("@rules_rust//rust:defs.bzl", "rust_library")
 
 package(default_visibility = ["//visibility:public"])
 
-opentitan_rust_library(
+rust_library(
     name = "testutil",
     srcs = [
         "lib.rs",

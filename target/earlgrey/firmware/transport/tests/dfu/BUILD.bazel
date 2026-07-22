@@ -4,7 +4,7 @@
 load("//target/earlgrey/signing/keys:defs.bzl", "FPGA_ECDSA_KEY")
 load("//target/earlgrey/tooling:opentitan_runner.bzl", "opentitan_test")
 load("//target/earlgrey/tooling/signing:defs.bzl", "manifest", "sign_bin")
-load("//third_party/lowrisc_opentitan:defs.bzl", "opentitan_rust_binary")
+load("@rules_rust//rust:defs.bzl", "rust_binary")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -34,7 +34,7 @@ sign_bin(
     ecdsa_key = FPGA_ECDSA_KEY,
 )
 
-opentitan_rust_binary(
+rust_binary(
     name = "host_usb_dfu_owner_transfer",
     srcs = ["host_usb_dfu_owner_transfer.rs"],
     data = [
@@ -102,7 +102,7 @@ opentitan_test(
     test_harness = ":host_usb_dfu_owner_transfer",
 )
 
-opentitan_rust_binary(
+rust_binary(
     name = "host_usb_dfu_spi_flash",
     srcs = ["host_usb_dfu_spi_flash.rs"],
     edition = "2024",
@@ -158,7 +158,7 @@ opentitan_test(
     test_harness = ":host_usb_dfu_spi_flash",
 )
 
-opentitan_rust_binary(
+rust_binary(
     name = "host_usb_dfu_owner_block",
     srcs = ["host_usb_dfu_owner_block.rs"],
     data = [
@@ -227,4 +227,30 @@ opentitan_test(
     ],
     test_cmd = "--logging=info --firmware=target/earlgrey/firmware/transport/tests/dfu/transport_transfer.app_prod_0.signed.bin --golden-owner-block=target/earlgrey/signing/keys/dummy/dummy_owner_bin.bin",
     test_harness = ":host_usb_dfu_owner_block",
+)
+
+rust_binary(
+    name = "verification_test",
+    srcs = ["verification_test.rs"],
+    edition = "2024",
+    rustc_flags = [
+        "-C",
+        "link-arg=-Wl,--allow-shlib-undefined",
+    ],
+    deps = [
+        "//openprot:openprot_lib",
+        "//services/mctp/api:mctp_api",
+        "//services/mctp/server:mctp_server_lib",
+        "//target/earlgrey/testutil",
+        "//util/types",
+        "//third_party/lowrisc_opentitan:cryptotest_commands",
+        "//third_party/lowrisc_opentitan:opentitanlib",
+        "//third_party/lowrisc_opentitan:ot_hal",
+        "//third_party/lowrisc_opentitan:provisioning_ujson_lib",
+        "//third_party/lowrisc_opentitan:sphincsplus",
+        "//third_party/lowrisc_opentitan:transport_chipwhisperer",
+        "//third_party/lowrisc_opentitan:transport_hyperdebug",
+        "//third_party/lowrisc_opentitan:transport_verilator",
+        "@ot_crate_index//:anyhow",
+    ],
 )

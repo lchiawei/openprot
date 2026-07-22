@@ -142,9 +142,8 @@ archive_override(
 bazel_dep(name = "lowrisc_opentitan")
 git_override(
     module_name = "lowrisc_opentitan",
-    # Temporarily pointed to my fork until we upstream the needed changes.
-    remote = "https://github.com/cfrantz/opentitan",
-    tag = "opentitanlib-downstream-v1",
+    commit = "ddf4f864aa10a277bc8b5f6efc515512bc4eff71",
+    remote = "https://github.com/lchiawei/opentitan",
 )
 
 # Caliptra source repositories — declared via a module_extension in

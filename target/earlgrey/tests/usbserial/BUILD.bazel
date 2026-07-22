@@ -10,7 +10,6 @@ load("@rules_rust//rust:defs.bzl", "rust_binary")
 load("//target/earlgrey:defs.bzl", "TARGET_COMPATIBLE_WITH")
 load("//target/earlgrey/signing/keys:defs.bzl", "FPGA_ECDSA_KEY", "SILICON_ECDSA_KEY")
 load("//target/earlgrey/tooling:opentitan_runner.bzl", "opentitan_test")
-load("//third_party/lowrisc_opentitan:defs.bzl", "opentitan_rust_binary")
 
 rust_app(
     name = "test_usb",
@@ -140,7 +139,7 @@ opentitan_test(
     test_harness = ":host_usb_serial_check",
 )
 
-opentitan_rust_binary(
+rust_binary(
     name = "host_usb_serial_check",
     srcs = ["host_usb_serial_check.rs"],
     edition = "2024",
