@@ -1,8 +1,12 @@
 # Licensed under the Apache-2.0 license
 # SPDX-License-Identifier: Apache-2.0
 
-# Default to C++17 to ensure compatibility.
 common --@pigweed//pw_toolchain/cc:cxx_standard=17
+# Pass -lc_nonshared at the end of host rust binary link step
+build --@rules_rust//:extra_rustc_flags=-Clink-arg=-lc_nonshared
+common --host_copt=-frtti
+common --host_copt=-fexceptions
+common --linkopt=-lc_nonshared
 
 # Enable Rust formatting support in pigweed presubmits
 common --@pigweed//pw_presubmit/py:enable_rust_formatter=true

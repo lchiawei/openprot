@@ -140,10 +140,9 @@ archive_override(
 )
 
 bazel_dep(name = "lowrisc_opentitan")
-git_override(
+local_path_override(
     module_name = "lowrisc_opentitan",
-    commit = "11590984fa",
-    remote = "https://github.com/lchiawei/opentitan",
+    path = "../opentitan",
 )
 
 # Caliptra source repositories — declared via a module_extension in
